@@ -1,5 +1,9 @@
 # AI Travel Agent (Liwaa)
 
+[![CI](https://github.com/LiwaaCoder/ai_travel_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/LiwaaCoder/ai_travel_agent/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.10%20|%203.11-blue.svg)](pyproject.toml)
+
 Professional, RAG-powered travel planning assistant that generates grounded, personalized itineraries using LangChain and LangGraph. Tailored for demos, portfolios, and as a foundation for production deployment.
 
 ## 🌟 Highlights
@@ -94,7 +98,7 @@ python cli.py plan --city "Barcelona" --days 3 --preferences "food, art"
 
 **API Server:**
 ```bash
-uvicorn app:app --reload
+uvicorn server:app --reload
 # Then POST to http://localhost:8000/plan
 ```
 
@@ -111,7 +115,8 @@ pytest -v
 ## 📁 Project Structure
 
 ```
-├── app.py                     # FastAPI application
+├── server.py                  # FastAPI application (main entry)
+├── app.py                     # Thin wrapper re-exporting `server.app`
 ├── cli.py                     # Typer CLI with rich formatting
 ├── streamlit_app.py           # Streamlit web interface
 ├── models.py                  # Pydantic request/response models
