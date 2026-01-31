@@ -1,0 +1,32 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+.env
+.venv/
+venv/
+.envrc
+.idea/
+.vscode/
+.DS_Store
+
+# Vector store (rebuild with cli.py build-kb)
+vector_db/chroma_store/
+
+# Generated files
+static/generated/
+
+# Logs
+*.log
+logs/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.hypothesis/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
