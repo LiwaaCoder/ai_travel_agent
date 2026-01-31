@@ -107,6 +107,28 @@ uvicorn server:app --reload
 streamlit run streamlit_app.py
 ```
 
+### 5. Docker (optional but recommended)
+
+Build image and run with Compose:
+
+```bash
+# Build image
+docker build -t liwaa-travel-agent .
+
+# Start API + UI
+docker compose up -d
+
+# Stop
+docker compose down
+```
+
+Endpoints:
+- API: http://localhost:8000/docs
+- UI: http://localhost:8501
+
+Data persistence:
+- `docker-compose.yml` mounts `vector_db/` and `data/` so your knowledge base and embeddings persist across restarts.
+
 ### 4. Run Tests
 ```bash
 pytest -v
@@ -116,7 +138,10 @@ pytest -v
 
 ```
 ├── server.py                  # FastAPI application (main entry)
-├── app.py                     # Thin wrapper re-exporting `server.app`
+├── app.py                     # FastAPI app (compatibility wrapper)
+├── Dockerfile                 # Container image build
+├── docker-compose.yml         # API + UI services
+├── .dockerignore              # Reduce Docker build context
 ├── cli.py                     # Typer CLI with rich formatting
 ├── streamlit_app.py           # Streamlit web interface
 ├── models.py                  # Pydantic request/response models

@@ -1,0 +1,35 @@
+__pycache__/
+*.pyc
+*.pyo
+*.db
+.env
+.venv/
+venv/
+.envrc
+.idea/
+.vscode/
+.DS_Store
+.git/
+node_modules/
+
+# Vector store (large, can be mounted)
+vector_db/chroma_store/
+
+# Generated files
+static/generated/
+logs/
+*.log
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Screenshots and docs only
+screenshots/
+draft/
