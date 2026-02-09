@@ -20,6 +20,8 @@ from langgraph.graph import StateGraph, END
 from src.rag.pipeline import get_retriever
 from src.tools.weather import fetch_weather_summary
 from src.tools.poi import fetch_pois
+from src.tools.flights import fetch_flights, format_flights_for_prompt
+from src.tools.events import fetch_events, format_events_for_prompt
 from src.prompts import PromptLibrary, PromptType
 
 
@@ -70,6 +72,8 @@ class TravelAgentState(TypedDict):
     retrieved_context: list[str]
     weather_data: str
     poi_data: list[str]
+    flight_data: list[dict]  # Live flight info
+    event_data: list[dict]   # Live events (football, etc.)
     
     # Output
     response: str
@@ -129,11 +133,25 @@ async def fetch_all_data(state: TravelAgentState) -> dict:
         except Exception:
             return []
     
-    # Run ALL three in parallel
-    (context, sources), weather, pois = await asyncio.gather(
+    async def get_flights():
+        try:
+            return await asyncio.wait_for(fetch_flights(state["city"]), timeout=5)
+        except Exception:
+            return []
+    
+    async def get_events():
+        try:
+            return await asyncio.wait_for(fetch_events(state["city"]), timeout=5)
+        except Exception:
+            return []
+    
+    # Run ALL five in parallel
+    (context, sources), weather, pois, flights, events = await asyncio.gather(
         get_rag_context(),
         get_weather(),
         get_pois(),
+        get_flights(),
+        get_events(),
     )
     
     return {
@@ -141,6 +159,8 @@ async def fetch_all_data(state: TravelAgentState) -> dict:
         "sources": sources,
         "weather_data": weather,
         "poi_data": pois,
+        "flight_data": flights,
+        "event_data": events,
     }
 
 
@@ -157,10 +177,14 @@ async def synthesize_response(state: TravelAgentState) -> dict:
     prefs = state.get("preferences") or "culture, food, and authentic local experiences"
     context = state.get("retrieved_context", [])
     user_query = state.get("user_query", "")
+    flights = state.get("flight_data", [])
+    events = state.get("event_data", [])
     
     logger.info(f"Synthesizing response for {city}, {days_count} days")
     logger.info(f"POIs found: {len(pois)}")
     logger.info(f"RAG context chunks: {len(context)}")
+    logger.info(f"Flights found: {len(flights)}")
+    logger.info(f"Events found: {len(events)}")
     
     # Build rich context from RAG knowledge base
     if context:
@@ -230,6 +254,16 @@ RESPONSE STYLE:
 {rag_knowledge}
 
 ═══════════════════════════════════════════════════════════════
+✈️ LIVE FLIGHT OPTIONS (Real-time data!)
+═══════════════════════════════════════════════════════════════
+{format_flights_for_prompt(flights)}
+
+═══════════════════════════════════════════════════════════════
+⚽ UPCOMING EVENTS IN {city.upper()} (Live data!)
+═══════════════════════════════════════════════════════════════
+{format_events_for_prompt(events)}
+
+═══════════════════════════════════════════════════════════════
 ✍️ YOUR TASK
 ═══════════════════════════════════════════════════════════════
 Create a detailed day-by-day itinerary using this EXACT format:
@@ -277,6 +311,8 @@ IMPORTANT REMINDERS:
 - Include TIMING tips (when to go, how long to spend)
 - Make it feel PERSONAL, like advice from a well-traveled friend
 - Each day should have a logical FLOW (geography, energy levels)
+- If there are LIVE EVENTS (football matches, etc.), suggest incorporating them!
+- Mention FLIGHT OPTIONS in the practical tips section
 ═══════════════════════════════════════════════════════════════
 
 Now, create this amazing itinerary!"""
@@ -421,6 +457,8 @@ class TravelAgent:
             "retrieved_context": [],
             "weather_data": "",
             "poi_data": [],
+            "flight_data": [],
+            "event_data": [],
             "response": "",
             "sources": [],
             "confidence": 0.0,
