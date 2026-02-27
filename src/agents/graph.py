@@ -9,8 +9,8 @@ Optimizations:
 5. Streamlined prompts
 """
 
-from typing import TypedDict, Optional
-from dataclasses import dataclass
+from typing import TypedDict, Optional, List, Dict
+from dataclasses import dataclass, field
 import asyncio
 
 from langchain_openai import ChatOpenAI
@@ -69,15 +69,15 @@ class TravelAgentState(TypedDict):
     
     # Processing
     intent: str  # "plan", "info", "events", "book"
-    retrieved_context: list[str]
+    retrieved_context: List[str]
     weather_data: str
-    poi_data: list[str]
-    flight_data: list[dict]  # Live flight info
-    event_data: list[dict]   # Live events (football, etc.)
+    poi_data: List[str]
+    flight_data: List[Dict]  # Live flight info
+    event_data: List[Dict]   # Live events (football, etc.)
     
     # Output
     response: str
-    sources: list[str]
+    sources: List[str]
     confidence: float
 
 
@@ -409,10 +409,12 @@ class TravelPlan:
     days: int
     preferences: Optional[str]
     summary: str
-    pois: list[str]
+    pois: List[str]
     weather: str
-    sources: list[str]
+    sources: List[str]
     confidence: float
+    flights: List[Dict] = field(default_factory=list)
+    events: List[Dict] = field(default_factory=list)
 
 
 class TravelAgent:
@@ -476,6 +478,8 @@ class TravelAgent:
             weather=result["weather_data"],
             sources=result["sources"],
             confidence=result["confidence"],
+            flights=result.get("flight_data", []),
+            events=result.get("event_data", []),
         )
 
 

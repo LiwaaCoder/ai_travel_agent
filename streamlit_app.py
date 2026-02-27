@@ -306,7 +306,7 @@ if st.button("🚀 Generate Travel Plan", type="primary", use_container_width=Tr
     st.divider()
     
     # Tabs for different views
-    tab1, tab2, tab3, tab4 = st.tabs(["📋 Itinerary", "🏛️ Attractions", "🌤️ Weather", "📖 Details"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📋 Itinerary", "🏛️ Attractions", "✈️ Flights", "🌤️ Weather", "📖 Details"])
     
     with tab1:
         structured_days = parse_itinerary(plan.summary)
@@ -417,6 +417,65 @@ if st.button("🚀 Generate Travel Plan", type="primary", use_container_width=Tr
             st.info("No specific POIs found. Check the itinerary for detailed recommendations.")
     
     with tab3:
+        st.subheader("✈️ Flight Information")
+        
+        # Access flights from the response (need to check if they're available)
+        if hasattr(plan, 'flights') and plan.flights:
+            st.success(f"Found {len(plan.flights)} flights to {city.title()}")
+            
+            for idx, flight in enumerate(plan.flights[:5], 1):  # Show up to 5 flights
+                with st.container():
+                    col1, col2, col3 = st.columns([2, 2, 1])
+                    
+                    with col1:
+                        airline = flight.get('airline', 'Unknown Airline')
+                        flight_num = flight.get('flight_number', 'N/A')
+                        st.markdown(f"**{airline}**")
+                        st.caption(f"Flight {flight_num}")
+                    
+                    with col2:
+                        origin = flight.get('origin', 'Unknown')
+                        # Format departure and arrival times
+                        dep_time = flight.get('departure_time', '')
+                        arr_time = flight.get('arrival_time', '')
+                        
+                        if dep_time:
+                            from datetime import datetime
+                            try:
+                                dep_dt = datetime.fromisoformat(dep_time.replace('Z', '+00:00'))
+                                dep_str = dep_dt.strftime('%b %d, %H:%M')
+                            except:
+                                dep_str = dep_time[:16] if len(dep_time) > 16 else dep_time
+                        else:
+                            dep_str = 'TBD'
+                        
+                        st.markdown(f"**{origin}** → **{city.title()}**")
+                        st.caption(f"🛫 Departs: {dep_str}")
+                    
+                    with col3:
+                        price = flight.get('price')
+                        if price:
+                            currency = flight.get('currency', 'USD')
+                            st.markdown(f"**${price}**")
+                            st.caption(currency)
+                        else:
+                            st.markdown("*Price N/A*")
+                    
+                    st.markdown("---")
+            
+            st.info("💡 **Tip:** Flight data is cached and may not reflect real-time pricing. Check airline websites for current rates.")
+        else:
+            st.info("🔍 No flight data available for this destination.")
+            st.markdown("""
+            **To enable live flight data:**
+            1. Get a free API key from [Aviationstack](https://aviationstack.com/)
+            2. Add it to your `.env` file: `AVIATIONSTACK_API_KEY=your_key_here`
+            3. Restart the application
+            
+            The app currently shows mock flight data for demonstration.
+            """)
+    
+    with tab4:
         st.subheader("🌤️ Weather & Climate")
         
         # Display weather prominently

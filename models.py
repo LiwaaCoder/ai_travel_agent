@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 
 class PlanRequest(BaseModel):
@@ -17,3 +17,5 @@ class PlanResponse(BaseModel):
     weather: str
     sources: List[str]
     confidence: float
+    flights: Optional[List[Dict]] = []
+    events: Optional[List[Dict]] = []
