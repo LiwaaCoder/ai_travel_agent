@@ -1,3 +1,4 @@
+from typing import Tuple, Optional
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -29,7 +30,7 @@ async def fetch_weather_summary(city: str) -> str:
     return f"Temp range next days: {min(temps_min):.0f}-{max(temps_max):.0f}°C"
 
 
-async def _geocode_city(city: str) -> tuple[float | None, float | None]:
+async def _geocode_city(city: str) -> Tuple[Optional[float], Optional[float]]:
     url = "https://geocoding-api.open-meteo.com/v1/search"
     async with httpx.AsyncClient(timeout=10) as client:
         resp = await client.get(url, params={"name": city, "count": 1})

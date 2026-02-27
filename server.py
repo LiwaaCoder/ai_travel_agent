@@ -1,3 +1,4 @@
+from typing import List, Optional
 from dotenv import load_dotenv
 load_dotenv()  # Load .env file before importing any OpenAI-dependent modules
 
@@ -17,15 +18,15 @@ agent = build_travel_agent()
 class PlanRequest(BaseModel):
     city: str
     days: int = 3
-    preferences: str | None = None
-    query: str | None = None
+    preferences: Optional[str] = None
+    query: Optional[str] = None
 
 
 class PlanResponse(BaseModel):
     plan: str
-    pois: list[str]
+    pois: List[str]
     weather: str
-    sources: list[str]
+    sources: List[str]
     confidence: float
 
 

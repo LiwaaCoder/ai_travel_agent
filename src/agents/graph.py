@@ -123,25 +123,25 @@ async def fetch_all_data(state: TravelAgentState) -> dict:
     
     async def get_weather():
         try:
-            return await asyncio.wait_for(fetch_weather_summary(state["city"]), timeout=5)
+            return await asyncio.wait_for(fetch_weather_summary(state["city"]), timeout=3)
         except Exception:
             return "Weather unavailable"
     
     async def get_pois():
         try:
-            return await asyncio.wait_for(fetch_pois(state["city"], state.get("preferences")), timeout=5)
+            return await asyncio.wait_for(fetch_pois(state["city"], state.get("preferences")), timeout=4)
         except Exception:
             return []
     
     async def get_flights():
         try:
-            return await asyncio.wait_for(fetch_flights(state["city"]), timeout=5)
+            return await asyncio.wait_for(fetch_flights(state["city"]), timeout=3)
         except Exception:
             return []
     
     async def get_events():
         try:
-            return await asyncio.wait_for(fetch_events(state["city"]), timeout=5)
+            return await asyncio.wait_for(fetch_events(state["city"]), timeout=3)
         except Exception:
             return []
     

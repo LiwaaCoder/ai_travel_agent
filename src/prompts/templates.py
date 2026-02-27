@@ -7,7 +7,7 @@ All prompts are designed to work with LangChain's ChatPromptTemplate.
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import Optional, Union, Dict
 from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 
@@ -315,13 +315,13 @@ class PromptLibrary:
 # CONVENIENCE FUNCTIONS
 # =============================================================================
 
-def get_prompt(prompt_type: str | PromptType) -> PromptTemplate:
+def get_prompt(prompt_type: Union[str, PromptType]) -> PromptTemplate:
     """Get a prompt template by name or type."""
     if isinstance(prompt_type, str):
         prompt_type = PromptType(prompt_type)
     return PromptLibrary.get(prompt_type)
 
 
-def get_all_prompts() -> dict[str, PromptTemplate]:
+def get_all_prompts() -> Dict[str, PromptTemplate]:
     """Get all available prompts."""
     return {pt.value: PromptLibrary.get(pt) for pt in PromptType}

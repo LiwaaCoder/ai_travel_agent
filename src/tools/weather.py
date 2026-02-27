@@ -1,3 +1,4 @@
+from typing import Tuple, Optional
 import httpx
 
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
@@ -30,7 +31,7 @@ async def fetch_weather_summary(city: str) -> str:
         return "Check local forecast"
 
 
-async def _geocode_city(city: str) -> tuple[float | None, float | None]:
+async def _geocode_city(city: str) -> Tuple[Optional[float], Optional[float]]:
     url = "https://geocoding-api.open-meteo.com/v1/search"
     try:
         async with httpx.AsyncClient(timeout=3) as client:

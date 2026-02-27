@@ -1,3 +1,4 @@
+from typing import List, Optional
 import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -5,7 +6,7 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=1, max=8))
-async def fetch_pois(city: str, preferences: str | None = None) -> list[str]:
+async def fetch_pois(city: str, preferences: Optional[str] = None) -> List[str]:
     """Fetch a few POIs from Overpass/OSM; keep it lightweight."""
     query = (
         f"[out:json][timeout:10];"
